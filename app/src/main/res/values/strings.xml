@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">黑米支付</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="title_home">主页</string>
+    <string name="title_dashboard">已解码</string>
+    <string name="title_notifications">消息</string>
+    <string name="title_paylog">订单</string>
+    <string name="title_bill">账单</string>
+    <string name="title_set">设置</string>
+    <string name="title_my">我的</string>
+    <string name="title_activity_movie_list">MovieList</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

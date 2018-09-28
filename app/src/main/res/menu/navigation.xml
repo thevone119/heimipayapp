@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_paylog"
+        android:icon="@drawable/ic_event_note_black_24dp"
+        android:title="@string/title_paylog" />
+
+    <item
+        android:id="@+id/nav_bill"
+        android:icon="@drawable/ic_attach_money_black_24dp"
+        android:title="@string/title_bill" />
+
+
+
+    <item
+        android:id="@+id/nav_my"
+        android:icon="@drawable/ic_person_black_24dp"
+        android:title="@string/title_my" />
+
+
+
+</menu>
