@@ -69,9 +69,9 @@ public class PayLogAdapter extends BaseAdapter {
         viewHolder.tv_prodPrice.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG);//中划线
         viewHolder.tv_payImgPrice.setText("¥"+log.getPayImgPrice()+"");
         if(log.getPayType()==2){
-            viewHolder.iv_payType.setImageResource(R.mipmap.zfb_logo64);
-        }else{
             viewHolder.iv_payType.setImageResource(R.mipmap.wx_logo);
+        }else{
+            viewHolder.iv_payType.setImageResource(R.mipmap.zfb_logo64);
         }
 
         return convertView;

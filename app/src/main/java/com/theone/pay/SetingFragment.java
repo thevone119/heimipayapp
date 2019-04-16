@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.theone.pay.db.DBUtils;
+import com.theone.pay.db.wxDBHandle;
 import com.theone.pay.httpservice.PayService;
 import com.theone.pay.model.PayBus;
 import com.theone.pay.model.RetObject;
@@ -66,14 +67,14 @@ public class SetingFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-
+    private String apkRoot;
 
     //各种控件
     private Button but_set1;
     private Button but_set2;
     private Button but_set3;
     private Button but_set4;
-
+    private Button but_set5;
 
 
     public SetingFragment() {
@@ -118,12 +119,16 @@ public class SetingFragment extends Fragment {
         topBar.setLeftButtonVisibility(false);
         topBar.setRightButtonVisibility(false);
 
+        apkRoot="chmod 777 "+ this.getActivity().getPackageCodePath();
+
         //初始化控件
         but_set1= (Button) view.findViewById(R.id.but_set1);
         but_set2= (Button) view.findViewById(R.id.but_set2);
         but_set3= (Button) view.findViewById(R.id.but_set3);
         but_set4= (Button) view.findViewById(R.id.but_set4);
-        but_set4.setVisibility(View.GONE);
+        but_set5= (Button) view.findViewById(R.id.but_set5);
+        but_set5.setVisibility(View.GONE);
+        //but_set4.setVisibility(View.GONE);
 
 
         initData();
@@ -151,11 +156,11 @@ public class SetingFragment extends Fragment {
                                         }
                                     }
         );
-        //注册事件
+        //注册事件,申请ROOT
         but_set4.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
-
+                                            wxDBHandle.execRootCmd(apkRoot);
                                         }
                                     }
         );

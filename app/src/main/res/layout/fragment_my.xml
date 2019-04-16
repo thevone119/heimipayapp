@@ -307,57 +307,75 @@
                 android:orientation="vertical"
                 android:gravity="center_horizontal"
                 >
-                <Button
-                    android:id="@+id/but_exitsys"
+
+                <TableLayout
                     android:layout_width="match_parent"
-                    android:layout_height="35dp"
-                    android:background="@drawable/button_red"
-                    android:text="注销/退出当前商户"
-                    android:textColor="@android:color/white" />
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="10dp"
-                    />
-                <Button
-                    android:id="@+id/but_test"
-                    android:layout_width="match_parent"
-                    android:layout_height="35dp"
-                    android:background="@drawable/button_blue"
-                    android:text="测试APP接收通知"
-                    android:textColor="@android:color/white" />
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="10dp"
-                    />
-                <Button
-                    android:id="@+id/but_set1"
-                    android:layout_width="match_parent"
-                    android:layout_height="35dp"
-                    android:background="@drawable/button_green"
-                    android:text="设置通知使用权"
-                    android:textColor="@android:color/white" />
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="10dp"
-                    />
-                <Button
-                    android:id="@+id/but_set2"
-                    android:layout_width="match_parent"
-                    android:layout_height="35dp"
-                    android:background="@drawable/button_green"
-                    android:text="设置通知栏"
-                    android:textColor="@android:color/white" />
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="10dp"
-                    />
-                <Button
-                    android:id="@+id/but_set3"
-                    android:layout_width="match_parent"
-                    android:layout_height="35dp"
-                    android:background="@drawable/button_green"
-                    android:text="设置开机启动"
-                    android:textColor="@android:color/white" />
+                    android:layout_height="match_parent"
+                    android:stretchColumns="0,1"
+                    android:gravity="center">
+                    <TableRow>
+                        <Button
+                            android:id="@+id/but_exitsys"
+                            android:layout_width="match_parent"
+                            android:layout_height="35dp"
+                            android:background="@drawable/button_red"
+                            android:text="注销/退出当前商户"
+                            android:layout_margin="5dp"
+                            android:textColor="@android:color/white" />
+
+                        <Button
+                            android:id="@+id/but_test"
+                            android:layout_width="match_parent"
+                            android:layout_height="35dp"
+                            android:layout_margin="5dp"
+                            android:background="@drawable/button_blue"
+                            android:text="测试APP接收通知"
+                            android:textColor="@android:color/white" />
+                    </TableRow>
+                    <TableRow>
+                        <Button
+                            android:id="@+id/but_set1"
+                            android:layout_width="match_parent"
+                            android:layout_height="35dp"
+                            android:background="@drawable/button_green"
+                            android:text="设置通知使用权"
+                            android:layout_margin="5dp"
+                            android:textColor="@android:color/white" />
+
+                        <Button
+                            android:id="@+id/but_set2"
+                            android:layout_width="match_parent"
+                            android:layout_height="35dp"
+                            android:background="@drawable/button_green"
+                            android:text="设置通知栏"
+                            android:layout_margin="5dp"
+                            android:textColor="@android:color/white" />
+                    </TableRow>
+                    <TableRow>
+                        <Button
+                            android:id="@+id/but_set3"
+                            android:layout_width="match_parent"
+                            android:layout_height="35dp"
+                            android:layout_margin="5dp"
+                            android:background="@drawable/button_green"
+                            android:text="设置开机启动"
+                            android:textColor="@android:color/white" />
+
+                        <Button
+                            android:id="@+id/but_set4"
+                            android:layout_width="match_parent"
+                            android:layout_height="35dp"
+                            android:layout_margin="5dp"
+                            android:background="@drawable/button_green"
+                            android:text="申请root权限"
+                            android:textColor="@android:color/white" />
+                    </TableRow>
+                </TableLayout>
+
+
+
+
+
 
             </LinearLayout>
 

@@ -80,6 +80,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="45dp"
                     android:background="@drawable/button_blue"
+                    android:text="申请ROOT权限"
+                    android:textColor="@android:color/white" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp"
+                    />
+                <Button
+                    android:id="@+id/but_set5"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:background="@drawable/button_red"
                     android:text="xx"
                     android:textColor="@android:color/white" />
 

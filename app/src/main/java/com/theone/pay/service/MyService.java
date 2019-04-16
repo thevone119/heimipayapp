@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.theone.pay.db.wxDBHandle;
 import com.theone.pay.httpservice.PayService;
 import com.theone.pay.model.RetObject;
 import com.theone.pay.utils.MyRequests;
@@ -51,6 +52,12 @@ public class MyService extends Service {
                         //2.发送
                         try {
                             new PayService().sendAllNotify();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        //加载微信数据
+                        try {
+                            wxDBHandle.loadWXData();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

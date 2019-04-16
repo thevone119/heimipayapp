@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.theone.pay.model.PayBus;
@@ -179,6 +180,37 @@ public class MyApplication extends Application {
             e.printStackTrace();
         }
     }
+
+
+    /**
+     * 获取IMEI号
+     */
+    public String getImei(){
+        try{
+            TelephonyManager TelephonyMgr = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
+            String szImei = TelephonyMgr.getDeviceId();
+            return szImei;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+    /**
+     * 获取IMEI号
+     */
+    private String getImei2(){
+        try{
+
+            //android.os.SystemProperties.get(android.telephony.TelephonyProperties.PROPERTY_IMEI);
+            //String szImei = TelephonyMgr.getDeviceId();
+            //return szImei;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
 }
 
 

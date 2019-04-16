@@ -1,5 +1,6 @@
 package com.theone.pay;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.app.Notification;
@@ -33,6 +34,7 @@ import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.theone.pay.adapter.PayLogAdapter;
 import com.theone.pay.db.DBUtils;
+import com.theone.pay.db.wxDBHandle;
 import com.theone.pay.httpservice.PayService;
 import com.theone.pay.model.PayBus;
 import com.theone.pay.model.PayLog;
@@ -42,6 +44,9 @@ import com.theone.pay.model.TempObj;
 import com.theone.pay.view.PayLogQueryPopupWindow;
 import com.theone.pay.view.TopBar01;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -65,6 +70,9 @@ public class MyConfigFragment extends Fragment {
 
     public static long lastPostTime=0;//最后接收通知的时间
 
+    private static boolean mHaveRoot = false;
+
+    private String apkRoot;
     //单列
     private static MyConfigFragment fragment;
 
@@ -88,6 +96,8 @@ public class MyConfigFragment extends Fragment {
     private Button but_set1;
     private Button but_set2;
     private Button but_set3;
+    private Button but_set4;
+
 
     //private TextView tv_gobackUrl;
     //private TextView tv_notifyUrl;
@@ -130,6 +140,7 @@ public class MyConfigFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
         }
         loading = new ProgressDialog(this.getActivity());
+
     }
 
 
@@ -143,12 +154,16 @@ public class MyConfigFragment extends Fragment {
         topBar.setLeftButtonVisibility(false);
         topBar.setRightButtonVisibility(false);
 
+        apkRoot="chmod -R 777 "+ this.getActivity().getPackageCodePath();
+
         //初始化控件
         but_exitsys= (Button) view.findViewById(R.id.but_exitsys);
         but_test= (Button) view.findViewById(R.id.but_test);
         but_set1= (Button) view.findViewById(R.id.but_set1);
         but_set2= (Button) view.findViewById(R.id.but_set2);
         but_set3= (Button) view.findViewById(R.id.but_set3);
+        but_set4= (Button) view.findViewById(R.id.but_set4);
+
 
         //tv_gobackUrl= (TextView) view.findViewById(R.id.tv_gobackUrl);
         //tv_notifyUrl= (TextView) view.findViewById(R.id.tv_notifyUrl);
@@ -270,6 +285,26 @@ public class MyConfigFragment extends Fragment {
                                     }
         );
 
+        //注册事件
+        but_set4.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+
+                                            if (!mHaveRoot) {
+                                                int ret = wxDBHandle.execRootCmdSilent("echo test"); // 通过执行测试命令来检测
+                                                if (ret != -1) {
+                                                    wxDBHandle.execRootCmd(apkRoot);
+                                                    mHandler.obtainMessage(-1, "申请成功，当前手机已经具有ROOT权限!").sendToTarget();
+                                                    mHaveRoot = true;
+                                                } else {
+                                                    mHandler.obtainMessage(-1, "请对手机进行ROOT，并给与相应的ROOT权限!").sendToTarget();
+                                                }
+                                            } else {
+                                                mHandler.obtainMessage(-1, "申请成功，当前手机已经具有ROOT权限!").sendToTarget();
+                                            }
+                                        }
+                                    }
+        );
 
         //txt_content.setText("hello "+mParam1);
         //下拉刷新组件
@@ -366,6 +401,9 @@ public class MyConfigFragment extends Fragment {
             tv_busAcc.setText(bus.getBusAcc());
         }
     }
+
+
+
 
     /**
      * 视图创建完成执行的方法
@@ -562,4 +600,6 @@ public class MyConfigFragment extends Fragment {
             startActivity(intent);
         }
     }
+
+
 }
