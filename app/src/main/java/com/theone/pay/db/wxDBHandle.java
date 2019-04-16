@@ -29,6 +29,8 @@ import java.io.OutputStream;
 import java.io.*;
 import java.security.MessageDigest;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 import static android.content.Context.TELEPHONY_SERVICE;
 
@@ -51,9 +53,12 @@ public class wxDBHandle {
     private static boolean mHaveRoot = false;
 
     private static long lastTime;//最后运行时间
+    //存在判断
+    private static Map<String,String> hasMap = new HashMap<String,String>();
 
     /**
      * 每分钟执行一次，加载微信的数据
+     * 这里搞成10秒执行一次吧
      */
     public static void loadWXData(){
         //小于5秒，直接返回
@@ -120,15 +125,17 @@ public class wxDBHandle {
                 String talker = c1.getString(c1.getColumnIndex("talker"));
                 String content = c1.getString(c1.getColumnIndex("content"));
                 String msgSeq = c1.getString(c1.getColumnIndex("msgSeq"));
+                if(content==null||content.indexOf("[收款到账通知]")==-1){
+                    continue;
+                }
+                content = HtmlProcess.extractHtml(content,"<title>","</title>");
                 WXMessage msg = new WXMessage();
                 msg.content = content;
                 msg.talker=talker;
                 msg.msgid=parseLong(msgSvrId);
                 msg.createtime = parseLong(createTime);
                 msg.msgseq = parseInt(msgSeq);
-                if(msg.content.indexOf("[收款到账通知]")==-1){
-                    continue;
-                }
+
                 Log.i(TAG,msg.toString());
             }
             c1.close();
