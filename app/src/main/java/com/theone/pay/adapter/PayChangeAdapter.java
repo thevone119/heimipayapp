@@ -62,7 +62,7 @@ public class PayChangeAdapter extends BaseAdapter {
         if(log.getEmoney()>0){
             viewHolder.tv_emoney.setText("+"+log.getEmoney()+"");
         }else{
-            viewHolder.tv_emoney.setText("-"+log.getEmoney()+"");
+            viewHolder.tv_emoney.setText(""+log.getEmoney()+"");
         }
         viewHolder.tv_demo.setText(""+log.getDemo()+"");
         if(log.getCtype()==1){

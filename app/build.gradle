@@ -6,8 +6,8 @@ android {
         applicationId "com.theone.pay"
         minSdkVersion 18
         targetSdkVersion 22
-        versionCode 4
-        versionName "2.6"
+        versionCode 5
+        versionName "2.7"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -39,6 +39,9 @@ dependencies {
     implementation 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.5.1'
     implementation 'com.scwang.smartrefresh:SmartRefreshHeader:1.0.5.1'//没有使用特殊 Header，可以不加这行
     //sql加密的
-    compile 'net.zetetic:android-database-sqlcipher:3.5.7@aar'
+    implementation 'net.zetetic:android-database-sqlcipher:3.5.7@aar'
+    //Xposed框架
+    compileOnly 'de.robv.android.xposed:api:82'
+    compileOnly 'de.robv.android.xposed:api:82:sources'
 
 }

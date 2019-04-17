@@ -4,7 +4,7 @@ package com.theone.pay.model;
  * 微信的消息对象
  */
 public class WXMessage {
-    public long msgid;
+    public String msgid;
     public long createtime;
     public int msgseq;
     public String talker;

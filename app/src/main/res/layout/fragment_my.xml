@@ -274,19 +274,18 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="收款监控"
+                        android:text="运行模式"
                         />
-                    <Switch
-                        android:id="@+id/switch_listener"
-                        android:textOff="关"
-                        android:textOn="开"
-                        android:layout_weight="1"
+                    <Button
+                        android:id="@+id/but_run_tye"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:thumb="@drawable/thumb"
-                        android:track="@drawable/track"
-                        android:showText="true"
-                        />
+                        android:layout_height="35dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/button_blue"
+                        android:text="xx"
+                        android:layout_margin="5dp"
+                        android:textColor="@android:color/white" />
+
                 </LinearLayout>
 
 

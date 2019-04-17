@@ -8,6 +8,7 @@ import android.util.Log;
 import com.theone.pay.db.wxDBHandle;
 import com.theone.pay.httpservice.PayService;
 import com.theone.pay.model.RetObject;
+import com.theone.pay.model.SysConfig;
 import com.theone.pay.utils.MyRequests;
 
 /**
@@ -57,7 +58,9 @@ public class MyService extends Service {
                         }
                         //加载微信数据
                         try {
-                            wxDBHandle.loadWXData();
+                            if(SysConfig.getCurrSysConfig().listenerPay==2){
+                                wxDBHandle.loadWXData();
+                            }
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

@@ -10,17 +10,38 @@ import com.theone.pay.model.TempObj;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * 单列运行吧
+ */
 public class DBUtils {
     private static final String TAG = "DBUtils";
+
+    private static SQLiteDatabase _db;
+    //全局锁
+    private static Lock lock = new ReentrantLock();
+    private static synchronized SQLiteDatabase getDB(){
+        if(_db==null||!_db.isOpen()){
+            DatabaseHelper dbHelper =  new DatabaseHelper(MyApplication.getApplication());
+            _db = dbHelper.getWritableDatabase();
+        }
+        if(lock==null){
+            lock = new ReentrantLock();
+        }
+        return _db;
+    }
+
     /**
      * 根据key查询记录
      * @param tempkey
      * @return
      */
     public static TempObj getByKey(String tempkey){
-        DatabaseHelper dbHelper =  new DatabaseHelper(MyApplication.getApplication());
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        //DatabaseHelper dbHelper =  new DatabaseHelper(MyApplication.getApplication());
+        SQLiteDatabase db = getDB();
+        lock.lock();
         try{
             Cursor cursor = db.query(DatabaseHelper.TABLE_NAME, null, "tempkey=?", new String[]{tempkey}, null, null, null);
             if (cursor.moveToNext()) {
@@ -36,9 +57,10 @@ public class DBUtils {
             e.printStackTrace();
             throw e;
         }finally {
+            lock.unlock();
             //db.close();
             //dbHelper.close();
-            Log.i(TAG,"getByKey---------");
+            //Log.i(TAG,"getByKey---------");
         }
         return null;
     }
@@ -49,8 +71,10 @@ public class DBUtils {
      */
     public static void save(TempObj obj){
         TempObj _obj  = getByKey(obj.getTempkey());
-        DatabaseHelper dbHelper =  new DatabaseHelper(MyApplication.getApplication());
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        //DatabaseHelper dbHelper =  new DatabaseHelper(MyApplication.getApplication());
+        //SQLiteDatabase db = dbHelper.getWritableDatabase();
+        SQLiteDatabase db = getDB();
+        lock.lock();
         try{
             if(_obj==null){
                 ContentValues contentValues = new ContentValues();
@@ -73,6 +97,7 @@ public class DBUtils {
         }finally {
             //db.close();
             //dbHelper.close();
+            lock.unlock();
             Log.i(TAG,"save---------");
         }
         //db.close();
@@ -83,8 +108,10 @@ public class DBUtils {
      * @param tempkey
      */
     public static void delete(String tempkey){
-        DatabaseHelper dbHelper =  new DatabaseHelper(MyApplication.getApplication());
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        //DatabaseHelper dbHelper =  new DatabaseHelper(MyApplication.getApplication());
+        //SQLiteDatabase db = dbHelper.getWritableDatabase();
+        SQLiteDatabase db = getDB();
+        lock.lock();
         try{
             db.delete(DatabaseHelper.TABLE_NAME ,"tempkey=?",new String[]{tempkey});
 
@@ -94,6 +121,7 @@ public class DBUtils {
         }finally {
             //db.close();
             //dbHelper.close();
+            lock.unlock();
             Log.i(TAG,"delete---------");
         }
     }
@@ -104,9 +132,11 @@ public class DBUtils {
      * @return
      */
     public static List<TempObj> listObj(String temptype){
-        DatabaseHelper dbHelper =  new DatabaseHelper(MyApplication.getApplication());
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        //DatabaseHelper dbHelper =  new DatabaseHelper(MyApplication.getApplication());
+        //SQLiteDatabase db = dbHelper.getWritableDatabase();
         List<TempObj> list= new ArrayList<TempObj>();
+        SQLiteDatabase db = getDB();
+        lock.lock();
         try{
             Cursor cursor = db.query(DatabaseHelper.TABLE_NAME, null, "temptype=?", new String[]{temptype}, null, null, null);
             while (cursor.moveToNext()) {
@@ -124,6 +154,7 @@ public class DBUtils {
         }finally {
             //db.close();
             //dbHelper.close();
+            lock.unlock();
             Log.i(TAG,"listObj---------");
         }
         return list;

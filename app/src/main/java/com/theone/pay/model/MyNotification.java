@@ -22,13 +22,14 @@ import java.util.Map;
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class MyNotification {
     private String nkey;//通知的唯一主键
-    private int id;
+    private String id;
     private long postTime;
     private Long postTimeService;//app通知的时间，计算得到的服务器时间
     private String packageName;
     private String title;
     private String text;
     private String subText;
+
 
     private String uid;//商户ID
     private Integer state=0;//状态，0：未提交，1：已提交服务器 2：已关联相关定的订单
@@ -45,42 +46,58 @@ public class MyNotification {
 
     }
 
+    public MyNotification(WXMessage msg){
+        this.id=msg.msgid;
+        this.postTime = msg.createtime;
+        this.postTimeService = msg.createtime;
+        this.packageName = "com.tencent.mm";
+        this.title = msg.talker;
+        this.text = msg.content;
+        this.subText = msg.msgseq+"";
+        this.nkey = "wxm_"+msg.msgid;
+    }
+
     public MyNotification(StatusBarNotification sbn){
-        this.id =  sbn.getId();
+        this.id =  sbn.getId()+"";
         this.postTime=sbn.getPostTime();
         this.packageName= sbn.getPackageName();
         Notification notification = sbn.getNotification();
-        if (Build.VERSION.SDK_INT >Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            if(notification!=null){
-                Bundle extras = notification.extras;
-                String notificationTitle = extras.getString(Notification.EXTRA_TITLE);
-                //int notificationIcon = extras.getInt(Notification.EXTRA_SMALL_ICON);
-                //Bitmap notificationLargeIcon = ((Bitmap)extras.getParcelable(Notification.EXTRA_LARGE_ICON));
-                CharSequence notificationText = extras.getCharSequence(Notification.EXTRA_TEXT);
-                CharSequence notificationSubText = extras.getCharSequence(Notification.EXTRA_SUB_TEXT);
-                this.title=notificationTitle;
-                if(notificationText!=null){
-                    this.text=notificationText.toString();
-                    if(EmojiFilter.containsEmoji(this.text)){
-                        this.text = EmojiFilter.filterEmoji(this.text);
+        try{
+            if (Build.VERSION.SDK_INT >Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                if(notification!=null){
+                    Bundle extras = notification.extras;
+
+                    String notificationTitle = extras.getString(Notification.EXTRA_TITLE);
+                    //int notificationIcon = extras.getInt(Notification.EXTRA_SMALL_ICON);
+                    //Bitmap notificationLargeIcon = ((Bitmap)extras.getParcelable(Notification.EXTRA_LARGE_ICON));
+                    CharSequence notificationText = extras.getCharSequence(Notification.EXTRA_TEXT);
+                    CharSequence notificationSubText = extras.getCharSequence(Notification.EXTRA_SUB_TEXT);
+                    this.title=notificationTitle;
+                    if(notificationText!=null){
+                        this.text=notificationText.toString();
+                        if(EmojiFilter.containsEmoji(this.text)){
+                            this.text = EmojiFilter.filterEmoji(this.text);
+                        }
                     }
-                }
-                if(notificationSubText!=null){
-                    this.subText = notificationSubText.toString();
-                    if(EmojiFilter.containsEmoji(this.subText)){
-                        this.subText = EmojiFilter.filterEmoji(this.subText);
+                    if(notificationSubText!=null){
+                        this.subText = notificationSubText.toString();
+                        if(EmojiFilter.containsEmoji(this.subText)){
+                            this.subText = EmojiFilter.filterEmoji(this.subText);
+                        }
                     }
                 }
             }
+        }catch (Exception e){
+            e.printStackTrace();
         }
         this.nkey = "n_"+packageName+"_"+id+"_"+postTime;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

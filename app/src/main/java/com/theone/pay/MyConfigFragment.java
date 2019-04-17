@@ -42,6 +42,7 @@ import com.theone.pay.model.RetObject;
 import com.theone.pay.model.SysConfig;
 import com.theone.pay.model.TempObj;
 import com.theone.pay.view.PayLogQueryPopupWindow;
+import com.theone.pay.view.SelectRunTypePopupWindow;
 import com.theone.pay.view.TopBar01;
 
 import java.io.DataInputStream;
@@ -89,6 +90,8 @@ public class MyConfigFragment extends Fragment {
 
     private ProgressDialog loading;
 
+    private SelectRunTypePopupWindow popupQuery;
+
     //各种控件
     private Button but_exitsys;
     private Button but_test;
@@ -102,7 +105,7 @@ public class MyConfigFragment extends Fragment {
     //private TextView tv_gobackUrl;
     //private TextView tv_notifyUrl;
     private Switch switch_nofity;
-    private Switch switch_listener;
+    private Button but_run_tye;
     private TextView tv_busValidity;
     private TextView tv_busType;
     private TextView tv_eMoney;
@@ -168,7 +171,7 @@ public class MyConfigFragment extends Fragment {
         //tv_gobackUrl= (TextView) view.findViewById(R.id.tv_gobackUrl);
         //tv_notifyUrl= (TextView) view.findViewById(R.id.tv_notifyUrl);
         switch_nofity =  (Switch)view.findViewById(R.id.switch_nofity);
-        switch_listener =  (Switch)view.findViewById(R.id.switch_listener);
+        but_run_tye =  (Button)view.findViewById(R.id.but_run_tye);
 
         //switch_nofity.setTextOff("关");
         //switch_nofity.setTextOn("开");
@@ -194,20 +197,14 @@ public class MyConfigFragment extends Fragment {
             }
         });
         //注册事件
-        switch_listener.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SysConfig config= SysConfig.getCurrSysConfig();
-                if (isChecked){
-                    config.setListenerPay(1);
-                }else {
-                    mHandler.obtainMessage(-1, "关闭收款监控，本手机上的微信，支付宝收款将不会同步到系统哦").sendToTarget();
-                    config.setListenerPay(0);
-                }
-                SysConfig.saveCurrSysConfig(config);
-            }
-        });
-
+        but_run_tye.setOnClickListener(new View.OnClickListener() {
+                                           @Override
+                                           public void onClick(View v) {
+                                               //弹出选择菜单
+                                               initQueryPage(inflater,v);
+                                           }
+                                       }
+        );
 
         //注册事件
         but_exitsys.setOnClickListener(new View.OnClickListener() {
@@ -349,6 +346,9 @@ public class MyConfigFragment extends Fragment {
                             }
                         }, 0);
                         break;
+                    case 12://选择运行方式
+                        initData();
+                        break;
                     case -1://失败
                         Toast.makeText(MyConfigFragment.this.getActivity(),msg.obj.toString(),Toast.LENGTH_LONG).show();
                         break;
@@ -376,10 +376,19 @@ public class MyConfigFragment extends Fragment {
             }else{
                 switch_nofity.setChecked(false);
             }
-            if(config.getListenerPay()==1){
-                switch_listener.setChecked(true);
-            }else{
-                switch_listener.setChecked(false);
+            switch (config.listenerPay){
+                case 0:
+                    but_run_tye.setText("手工收款（不监控）");
+                    break;
+                case 1:
+                    but_run_tye.setText("通知栏监控");
+                    break;
+                case 2:
+                    but_run_tye.setText("ROOT数据监控");
+                    break;
+                case 3:
+                    but_run_tye.setText("X框架监控");
+                    break;
             }
         }
 
@@ -403,7 +412,16 @@ public class MyConfigFragment extends Fragment {
     }
 
 
-
+    /**
+     * 初始化查询页面
+     * @param inflater
+     */
+    private void initQueryPage(LayoutInflater inflater,View rightButton){
+        View popView = inflater.inflate(R.layout.popu_pay_run_type, null);
+        popupQuery = new SelectRunTypePopupWindow(this.getView(),rightButton,popView,mHandler);
+        popupQuery.initQueryValue();
+        popupQuery.show();
+    }
 
     /**
      * 视图创建完成执行的方法

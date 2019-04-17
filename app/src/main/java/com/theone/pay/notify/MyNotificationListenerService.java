@@ -9,6 +9,7 @@ import android.util.Log;
 import com.theone.pay.MyConfigFragment;
 import com.theone.pay.httpservice.PayService;
 import com.theone.pay.model.MyNotification;
+import com.theone.pay.model.SysConfig;
 
 
 import java.util.Date;
@@ -43,6 +44,10 @@ public class MyNotificationListenerService extends NotificationListenerService {
         }
         if(hasMap==null){
             hasMap = new HashMap<String,String>();
+        }
+        if(SysConfig.getCurrSysConfig().listenerPay!=1){
+            Log.i(TAG,"非通知监控，不处理 " );
+            return;
         }
         ////开启线程处理
         ////线程处理

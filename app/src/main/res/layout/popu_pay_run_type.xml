@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical">
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="10dp">
+
+        <TextView
+            android:id="@+id/tv_ctype"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="请选择运行模式"
+            android:textColor="@android:color/holo_blue_dark"
+            android:paddingLeft="10dp"
+            android:textStyle="bold" />
+        <!-- 单选项目显示RadioButton -->
+        <RadioGroup
+            android:id="@+id/rg_selectType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:id="@+id/rb_ctype_0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="10dp"
+                android:text="手工收款（不监控）" />
+
+            <RadioButton
+                android:id="@+id/rb_ctype_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:layout_weight="1"
+                android:text="通知监控" />
+
+            <RadioButton
+                android:id="@+id/rb_ctype_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:layout_weight="1"
+                android:text="ROOT数据监控" />
+            <RadioButton
+                android:id="@+id/rb_ctype_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:layout_weight="1"
+                android:text="X框架监控" />
+        </RadioGroup>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@android:color/darker_gray"
+            android:layout_marginBottom="1.0px"/>
+    </LinearLayout>
+
+
+</LinearLayout>

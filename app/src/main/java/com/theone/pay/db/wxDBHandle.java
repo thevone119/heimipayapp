@@ -19,6 +19,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 import com.theone.pay.MyApplication;
+import com.theone.pay.httpservice.PayService;
+import com.theone.pay.model.MyNotification;
 import com.theone.pay.model.WXMessage;
 import com.theone.pay.utils.HtmlProcess;
 import com.theone.pay.utils.SDCardHelper;
@@ -119,24 +121,24 @@ public class wxDBHandle {
             Log.i(TAG,"time:"+qt);
             Cursor c1 = db.rawQuery("select * from message where createtime > "+qt+" and talker='notifymessage' ", null);
             while (c1.moveToNext()) {
+                try{
+                    String msgSvrId = c1.getString(c1.getColumnIndex("msgSvrId"));
+                    String createTime = c1.getString(c1.getColumnIndex("createTime"));
+                    String talker = c1.getString(c1.getColumnIndex("talker"));
+                    String content = c1.getString(c1.getColumnIndex("content"));
+                    String msgSeq = c1.getString(c1.getColumnIndex("msgSeq"));
+                    content = HtmlProcess.extractHtml(content,"<title>","</des>");
+                    WXMessage msg = new WXMessage();
+                    msg.content = content;
+                    msg.talker=talker;
+                    msg.msgid=msgSvrId;
+                    msg.createtime = parseLong(createTime);
+                    msg.msgseq = parseInt(msgSeq);
+                    //发送并保存
+                    new PayService().saveAndSendNotify(new MyNotification(msg));
+                }catch (Exception e){
 
-                String msgSvrId = c1.getString(c1.getColumnIndex("msgSvrId"));
-                String createTime = c1.getString(c1.getColumnIndex("createTime"));
-                String talker = c1.getString(c1.getColumnIndex("talker"));
-                String content = c1.getString(c1.getColumnIndex("content"));
-                String msgSeq = c1.getString(c1.getColumnIndex("msgSeq"));
-                if(content==null||content.indexOf("[收款到账通知]")==-1){
-                    continue;
                 }
-                content = HtmlProcess.extractHtml(content,"<title>","</title>");
-                WXMessage msg = new WXMessage();
-                msg.content = content;
-                msg.talker=talker;
-                msg.msgid=parseLong(msgSvrId);
-                msg.createtime = parseLong(createTime);
-                msg.msgseq = parseInt(msgSeq);
-
-                Log.i(TAG,msg.toString());
             }
             c1.close();
             db.close();
