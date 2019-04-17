@@ -21,6 +21,8 @@ import org.xml.sax.XMLReader;
 import com.theone.pay.MyApplication;
 import com.theone.pay.httpservice.PayService;
 import com.theone.pay.model.MyNotification;
+import com.theone.pay.model.PayLog;
+import com.theone.pay.model.RetObject;
 import com.theone.pay.model.WXMessage;
 import com.theone.pay.utils.HtmlProcess;
 import com.theone.pay.utils.SDCardHelper;
@@ -32,7 +34,10 @@ import java.io.*;
 import java.security.MessageDigest;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static android.content.Context.TELEPHONY_SERVICE;
 
@@ -55,19 +60,46 @@ public class wxDBHandle {
     private static boolean mHaveRoot = false;
 
     private static long lastTime;//最后运行时间
+
     //存在判断
     private static Map<String,String> hasMap = new HashMap<String,String>();
+
+    /**
+     * 每分钟调用一次此方法
+     *
+     */
+    public static void loadWXData(){
+        //线程刷新
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                long lastTriggerTime = System.currentTimeMillis();
+                for(int i=0;i<10;i++){
+                    try{
+                        //如果已经大于55秒了，直接退出了
+                        if(System.currentTimeMillis()-lastTriggerTime>1000*55){
+                            return;
+                        }
+                        loadWXDataThread();
+                        Thread.sleep(1000*10);
+                    }catch (Exception e){
+
+                    }
+                }
+            }
+        }, 0);
+    }
 
     /**
      * 每分钟执行一次，加载微信的数据
      * 这里搞成10秒执行一次吧
      */
-    public static void loadWXData(){
+    private static void loadWXDataThread(){
         //小于5秒，直接返回
         if(System.currentTimeMillis()-lastTime<5000){
             return;
         }
-        lastTime= System.currentTimeMillis();
+        lastTime = System.currentTimeMillis();
         //1.判断是否有ROOT权限，如果没有权限，直接返回
         if(!mHaveRoot){
             int ret = execRootCmdSilent("echo test"); // 通过执行测试命令来检测
@@ -234,8 +266,13 @@ public class wxDBHandle {
         }
         try {
             String sdprivatePath   = SDCardHelper.getSDCardPrivateCacheDir(MyApplication.getApplication());
+
+            //execRootCmd2("chmod -R 777 "+ sdprivatePath);
+            //execRootCmd2("chmod -R 777 "+ WX_ROOT_PATH);
             String cp_path1 = sdprivatePath+"/"+CP_WX_SP_UIN_PATH;
             String str = String.valueOf("cp "+WX_SP_UIN_PATH+" "+ cp_path1);
+            //Log.i(TAG,"文件路径"+cp_path1);
+
             execRootCmd2(str);
             File file = new File(cp_path1);
             if(!file.exists()){
@@ -297,7 +334,7 @@ public class wxDBHandle {
             dos = new DataOutputStream(p.getOutputStream());
             dis = new DataInputStream(p.getInputStream());
 
-            Log.i(TAG, cmd);
+            //Log.i(TAG, cmd);
             dos.writeBytes(cmd + "\n");
             dos.flush();
             dos.writeBytes("exit\n");
@@ -329,6 +366,51 @@ public class wxDBHandle {
         return result;
     }
 
+    /**
+     * 判断是否具有ROOT权限
+     * @return
+     */
+    public static synchronized boolean getRootAhth()
+    {
+        Process process = null;
+        DataOutputStream os = null;
+        try
+        {
+            process = Runtime.getRuntime().exec("su");
+            os = new DataOutputStream(process.getOutputStream());
+            os.writeBytes("exit\n");
+            os.flush();
+            int exitValue = process.waitFor();
+            if (exitValue == 0)
+            {
+                return true;
+            } else
+            {
+                return false;
+            }
+        } catch (Exception e)
+        {
+            Log.d("*** DEBUG ***", "Unexpected error - Here is what I know: "
+                    + e.getMessage());
+            return false;
+        } finally
+        {
+            try
+            {
+                if (os != null)
+                {
+                    os.close();
+                }
+                process.destroy();
+            } catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+
     // 执行命令但不关注结果输出
     public static int execRootCmdSilent(String cmd) {
             int result = -1;
@@ -338,7 +420,7 @@ public class wxDBHandle {
                 Process p = Runtime.getRuntime().exec("su");
                 dos = new DataOutputStream(p.getOutputStream());
 
-                Log.i(TAG, cmd);
+                //Log.i(TAG, cmd);
                 dos.writeBytes(cmd + "\n");
                 dos.flush();
                 dos.writeBytes("exit\n");

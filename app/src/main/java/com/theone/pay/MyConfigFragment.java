@@ -286,18 +286,13 @@ public class MyConfigFragment extends Fragment {
         but_set4.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
-
-                                            if (!mHaveRoot) {
-                                                int ret = wxDBHandle.execRootCmdSilent("echo test"); // 通过执行测试命令来检测
-                                                if (ret != -1) {
-                                                    wxDBHandle.execRootCmd(apkRoot);
-                                                    mHandler.obtainMessage(-1, "申请成功，当前手机已经具有ROOT权限!").sendToTarget();
-                                                    mHaveRoot = true;
-                                                } else {
-                                                    mHandler.obtainMessage(-1, "请对手机进行ROOT，并给与相应的ROOT权限!").sendToTarget();
-                                                }
+                                            boolean isroot = wxDBHandle.getRootAhth(); // 通过执行测试命令来检测
+                                            if (isroot) {
+                                                mHandler.obtainMessage(-1, "当前手机已经具有ROOT权限!").sendToTarget();
+                                                mHaveRoot = true;
                                             } else {
-                                                mHandler.obtainMessage(-1, "申请成功，当前手机已经具有ROOT权限!").sendToTarget();
+                                                wxDBHandle.execRootCmd(apkRoot);
+                                                mHandler.obtainMessage(-1, "请对手机进行ROOT，并给与相应的ROOT权限!").sendToTarget();
                                             }
                                         }
                                     }

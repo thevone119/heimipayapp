@@ -46,6 +46,24 @@ public class MyNotification {
 
     }
 
+    public RunLog toRunLog(){
+        String logType = "";
+        String logText = "";
+        if(nkey.startsWith("n_")){
+            logType = "任务栏通知数据";
+            logText = title+"\n"+text;
+        }
+        if(nkey.startsWith("wxm_")){
+            logType = "微信消息数据";
+            logText = title+"\n"+text;
+        }
+
+
+        RunLog log = new RunLog(logType,logText);
+
+        return log;
+    }
+
     public MyNotification(WXMessage msg){
         this.id=msg.msgid;
         this.postTime = msg.createtime;

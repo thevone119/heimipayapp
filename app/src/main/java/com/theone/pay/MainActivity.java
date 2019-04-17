@@ -75,6 +75,9 @@ public class MainActivity extends AppCompatActivity  {
         if(itemid==R.id.nav_bill){
             transaction.replace(R.id.tb, PayChangeFragment.newInstance(""+itemid));
         }
+        if(itemid==R.id.nav_runlog){
+            transaction.replace(R.id.tb, RunLogFragment.newInstance(""+itemid));
+        }
         if(itemid==R.id.nav_my){
             transaction.replace(R.id.tb, MyConfigFragment.newInstance(""+itemid));
         }
@@ -228,7 +231,11 @@ public class MainActivity extends AppCompatActivity  {
     }
 
 
-
+    //永远不退出APP,返回键只是放入后台
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
 
 
     //查找跟进目录文件

@@ -10,6 +10,7 @@ import com.theone.pay.model.PayBus;
 import com.theone.pay.model.PayBusChange;
 import com.theone.pay.model.PayLog;
 import com.theone.pay.model.RetObject;
+import com.theone.pay.model.RunLog;
 import com.theone.pay.model.SysConfig;
 import com.theone.pay.model.TempObj;
 import com.theone.pay.utils.BaseUrlTools;
@@ -66,6 +67,7 @@ public class PayService {
         }else{
             ret = new RetObject(retstr);
         }
+        RunLog.putLog("系统登录","登录APP");
         //登录成功，保存当前商户信息
         if(ret.getSuccess()){
             try{
@@ -140,7 +142,7 @@ public class PayService {
             ret.setMsg("当前商户数据无效，请重新登录");
             return ret;
         }
-
+        RunLog.putLog("订单查询","订单查询");
         String url = BaseUrlTools.getBaseUrl()+"/api/pay/paylog/findPage";
         MyRequests req =new MyRequests();
         Map<String,String> postData =new HashMap<String,String>();
@@ -254,7 +256,7 @@ public class PayService {
             ret.setMsg("当前商户数据无效，请重新登录");
             return ret;
         }
-
+        RunLog.putLog("账单查询","账单查询");
         String url = BaseUrlTools.getBaseUrl()+"/api/pay/paybuschange/findPage";
         MyRequests req =new MyRequests();
         Map<String,String> postData =new HashMap<String,String>();
@@ -450,6 +452,7 @@ public class PayService {
             ret.setMsg("当前通知已提交");
             return ret;
         }
+
         //判断包名是否有效，只要匹配一个即匹配
         boolean isenable = false;
         List<String> listpname=this.queryPackageName();
@@ -481,6 +484,7 @@ public class PayService {
             ret.setMsg("通知内容无效");
             return ret;
         }
+        RunLog.putLog(notify.toRunLog());
         Log.i(TAG,"通过过滤的通知:"+notify.toString());
         Gson gson = new Gson();
         TempObj obj = DBUtils.getByKey(notify.getNkey());
