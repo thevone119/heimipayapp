@@ -111,17 +111,4 @@ public class XposedPayHook implements IXposedHookLoadPackage {
     }
 
 
-    //输出插入操作日志
-    private void printInsertLog(String tableName, String nullColumnHack, ContentValues contentValues, int conflictValue) {
-        String[] arrayConflicValues =
-                {"", " OR ROLLBACK ", " OR ABORT ", " OR FAIL ", " OR IGNORE ", " OR REPLACE "};
-        if (conflictValue < 0 || conflictValue > 5) {
-            return;
-        }
-        XposedBridge.log("Hook数据库insert。table：" + tableName
-                + "；nullColumnHack：" + nullColumnHack
-                + "；CONFLICT_VALUES：" + arrayConflicValues[conflictValue]
-                + "；contentValues:" + contentValues);
-    }
-
 }
