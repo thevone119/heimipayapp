@@ -61,6 +61,8 @@ public class wxDBHandle {
 
     private static long lastTime;//最后运行时间
 
+    private static long lastIdx = 0;
+
     //存在判断
     private static Map<String,String> hasMap = new HashMap<String,String>();
 
@@ -69,15 +71,16 @@ public class wxDBHandle {
      *
      */
     public static void loadWXData(){
+        lastIdx++;
         //线程刷新
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                long lastTriggerTime = System.currentTimeMillis();
+                long _lastIdx = lastIdx;
                 for(int i=0;i<10;i++){
                     try{
                         //如果已经大于55秒了，直接退出了
-                        if(System.currentTimeMillis()-lastTriggerTime>1000*55){
+                        if(_lastIdx!=lastIdx){
                             return;
                         }
                         loadWXDataThread();
@@ -160,14 +163,17 @@ public class wxDBHandle {
                     String content = c1.getString(c1.getColumnIndex("content"));
                     String msgSeq = c1.getString(c1.getColumnIndex("msgSeq"));
                     content = HtmlProcess.extractHtml(content,"<title>","</des>");
-                    WXMessage msg = new WXMessage();
-                    msg.content = content;
-                    msg.talker=talker;
-                    msg.msgid=msgSvrId;
-                    msg.createtime = parseLong(createTime);
-                    msg.msgseq = parseInt(msgSeq);
-                    //发送并保存
-                    new PayService().saveAndSendNotify(new MyNotification(msg));
+
+                    if(talker=="notifymessage"|| content.indexOf("收款")!=-1){
+                        WXMessage msg = new WXMessage();
+                        msg.content = content;
+                        msg.talker=talker;
+                        msg.msgid=msgSvrId;
+                        msg.createtime = parseLong(createTime);
+                        msg.msgseq = parseInt(msgSeq);
+                        //发送并保存
+                        new PayService().saveAndSendNotify(new MyNotification(msg));
+                    }
                 }catch (Exception e){
 
                 }
@@ -252,7 +258,9 @@ public class wxDBHandle {
      */
     public static String getWxPwd(){
         String md5 = md5(MyApplication.getApplication().getImei() + getCurrWxUin());
+
         String password = md5.substring(0, 7).toLowerCase();
+       //Log.i(TAG,"密码"+password);
         return password;
     }
 
@@ -455,6 +463,7 @@ public class wxDBHandle {
         }
         String md5 = md5(imei + uin);
         String password = md5.substring(0, 7).toLowerCase();
+        //Log.i(TAG,"初始化数据库密码"+password);
         return password;
     }
 
