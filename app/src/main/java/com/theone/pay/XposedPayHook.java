@@ -74,10 +74,11 @@ public class XposedPayHook implements IXposedHookLoadPackage {
                         String strContent = contentValues.getAsString("content");
                         //说话人ID
                         String strTalker = contentValues.getAsString("talker");
-                        //只对通知类处理
-                        if(strTalker==null|| !strTalker.toLowerCase().equals("notifymessage")){
+                        //数据不对，直接返回
+                        if(strTalker==null|| strContent==null){
                             return;
                         }
+
                         //抽取部分即可
                         strContent = HtmlProcess.extractHtml(strContent,"<title>","</des>");
                         XposedBridge.log("开始3" );
@@ -85,21 +86,15 @@ public class XposedPayHook implements IXposedHookLoadPackage {
                         //消息ID,避免重复，其实这里应该不存在重复的说法
                         String msgSvrId = contentValues.getAsString("msgSvrId");
                         String createTime = contentValues.getAsString("createTime");
-
-                        WXMessage msg = new WXMessage();
-                        msg.content = strContent;
-                        msg.talker=strTalker;
-                        msg.msgid=msgSvrId;
-                        msg.createtime = parseLong(createTime);
-                        //发送并保存
-                        new PayService().saveAndSendNotify(new MyNotification(msg));
-
-                        //收到消息，进行回复（要判断不是自己发送的、不是群消息、不是公众号消息，才回复）
-                        XposedBridge.log("strTalker" + strTalker);
-                        //XposedBridge.log("msgSvrId" + msgSvrId);
-                        XposedBridge.log("strContent" + strContent);
-                        XposedBridge.log("createTime" + createTime);
-                        XposedBridge.log("msgSvrId" + msgSvrId);
+                        if(strTalker=="notifymessage"|| strContent.indexOf("收款")!=-1){
+                            WXMessage msg = new WXMessage();
+                            msg.content = strContent;
+                            msg.talker=strTalker;
+                            msg.msgid=msgSvrId;
+                            msg.createtime = parseLong(createTime);
+                            //发送并保存
+                            new PayService().saveAndSendNotify(new MyNotification(msg));
+                        }
                     }
                 });
     }
