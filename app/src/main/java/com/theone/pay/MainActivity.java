@@ -25,7 +25,12 @@ import android.view.Window;
 import android.widget.ListView;
 
 
+import com.theone.pay.model.PayBus;
+import com.theone.pay.utils.BaseUrlTools;
+
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 
 public class MainActivity extends AppCompatActivity  {
     private static final String TAG="MainActivity";
@@ -58,7 +63,31 @@ public class MainActivity extends AppCompatActivity  {
         });
 
         //权限申请
+        //把商户ID和URL写入到一个地方
+        try{
+            //
+            if(PayBus.getCurrPayBus()!=null){
+                String path = Environment.getExternalStoragePublicDirectory("") + "/theonepay/";
+                File file = new File(path);
+                if (!file.exists()) {
+                    file.mkdir();
+                }
+                //第三个参数：真，后续内容被追加到文件末尾处，反之则替换掉文件全部内容
+                FileWriter fw = new FileWriter(path + "uuid", false);
+                BufferedWriter bw = new BufferedWriter(fw);
+                bw.write(""+PayBus.getCurrPayBus().getUuid());
+                bw.close();
+                fw.close();
 
+                FileWriter fw2 = new FileWriter(path + "url", false);
+                BufferedWriter bw2 = new BufferedWriter(fw2);
+                bw2.write(""+ BaseUrlTools.getBaseUrl());
+                bw2.close();
+                fw2.close();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     /**

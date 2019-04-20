@@ -1,12 +1,23 @@
 package com.theone.pay;
 
 import android.content.ContentValues;
+import android.os.Environment;
 
-import com.theone.pay.httpservice.PayService;
+import com.google.gson.Gson;
 import com.theone.pay.model.MyNotification;
-import com.theone.pay.model.SysConfig;
 import com.theone.pay.model.WXMessage;
 import com.theone.pay.utils.HtmlProcess;
+import com.theone.pay.utils.MyRequests;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
@@ -58,9 +69,7 @@ public class XposedPayHook implements IXposedHookLoadPackage {
                         if (!tableName.toLowerCase().equals("message")) {
                             return;
                         }
-                        if(SysConfig.getCurrSysConfig().getListenerPay()!=3){
-                            XposedBridge.log("非X框架运行，APP不做处理" );
-                        }
+
                         //打印出日志
 //                        printInsertLog(tableName, (String) param.args[1], contentValues, (Integer) param.args[3]);
 
@@ -78,9 +87,11 @@ public class XposedPayHook implements IXposedHookLoadPackage {
                         if(strTalker==null|| strContent==null){
                             return;
                         }
-
                         //抽取部分即可
                         strContent = HtmlProcess.extractHtml(strContent,"<title>","</des>");
+                        if(strContent==null){
+                            return;
+                        }
                         XposedBridge.log("开始3" );
                         //contentValues.keySet();
                         //消息ID,避免重复，其实这里应该不存在重复的说法
@@ -92,8 +103,9 @@ public class XposedPayHook implements IXposedHookLoadPackage {
                             msg.talker=strTalker;
                             msg.msgid=msgSvrId;
                             msg.createtime = parseLong(createTime);
+                            postMsg(new MyNotification(msg));
                             //发送并保存
-                            new PayService().saveAndSendNotify(new MyNotification(msg));
+                            //new PayService().saveAndSendNotify(new MyNotification(msg));
                         }
                     }
                 });
@@ -108,6 +120,95 @@ public class XposedPayHook implements IXposedHookLoadPackage {
         }catch (Exception e){
         }
         return 0;
+    }
+
+    private static void postMsg(MyNotification msg){
+        XposedBridge.log("发送数据" );
+
+        String path = Environment.getExternalStoragePublicDirectory("") + "/theonepay/";
+        File file = new File(path);
+        if (!file.exists()) {
+            file.mkdir();
+        }
+        try{
+            String uuid = null;
+            String url = null;
+            if(uuid==null){
+                //读取UUID
+                InputStream instream = new FileInputStream(path + "uuid");
+                if(instream!=null){
+                    InputStreamReader inputreader
+                            = new InputStreamReader(instream, "UTF-8");
+                    BufferedReader buffreader = new BufferedReader(inputreader);
+                    String line = "";
+                    //分行读取
+                    if ((line = buffreader.readLine()) != null) {
+                        uuid = line;
+                    }
+                    instream.close();//关闭输入流
+                    buffreader.close();
+                }
+            }
+            if(url==null){
+                //读取url
+                InputStream instream = new FileInputStream(path + "url");
+                if(instream!=null){
+                    InputStreamReader inputreader
+                            = new InputStreamReader(instream, "UTF-8");
+                    BufferedReader buffreader = new BufferedReader(inputreader);
+                    String line = "";
+                    //分行读取
+                    if ((line = buffreader.readLine()) != null) {
+                        url = line;
+                    }
+                    instream.close();//关闭输入流
+                    buffreader.close();;
+                }
+            }
+            XposedBridge.log("发送数据,uuid:" +uuid+",url:"+url);
+            msg.setUid(uuid);
+
+            //第三个参数：真，后续内容被追加到文件末尾处，反之则替换掉文件全部内容
+            FileWriter fw = new FileWriter(path + msg.getNkey(), false);
+            BufferedWriter bw = new BufferedWriter(fw);
+            Gson gson = new Gson();
+            bw.write(gson.toJson(msg));//
+            bw.close();
+            fw.close();
+            if(url!=null && uuid!=null){
+                sendMsg(msg,url);
+            }
+        }catch (Exception e){
+            XposedBridge.log("创建数据失败" );
+        }
+
+
+    }
+
+    private static void sendMsg(MyNotification notify,String baseurl){
+        //baseurl ="http://192.168.1.100:8090/";
+        String url = baseurl+"/api/pay/payappnotification/saveAppNotification?t="+System.currentTimeMillis();
+        //XposedBridge.log("发送数据,,url:"+url);
+        MyRequests req =new MyRequests();
+        Map<String,String> postData =new HashMap<String,String>();
+        req.setConnectTimeout(3000);
+        req.setReadTimeout(5000);
+        postData.put("nkey",notify.getNkey()+"");
+        postData.put("id",notify.getId()+"");
+        postData.put("packageName",notify.getPackageName()+"");
+        postData.put("postTime",notify.getPostTime()+"");
+
+        postData.put("title",notify.getTitle()+"");
+        postData.put("text",notify.getText()+"");
+        postData.put("subText",notify.getSubText()+"");
+
+        postData.put("uid",notify.getUid()+"");
+        postData.put("postTimeService",notify.getPostTimeService()+"");
+
+        postData.put("sign",notify.MarkSign());
+        //发送服务器请求
+        String retstr = req.post(url,postData);
+        XposedBridge.log("发送数据返回:" +retstr);
     }
 
 

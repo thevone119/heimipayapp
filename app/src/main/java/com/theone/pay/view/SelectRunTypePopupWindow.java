@@ -56,13 +56,8 @@ public class SelectRunTypePopupWindow {
                     mHandler.obtainMessage(12, "重设运行模式").sendToTarget();
                     //window.dismiss();
                 }
-                if (checkedId == R.id.rb_ctype_2 && config.listenerPay!=2 ) //rb3设定为正确答案
-                {
-                    config.listenerPay=2;
-                    SysConfig.saveCurrSysConfig(config);
-                    mHandler.obtainMessage(12, "重设运行模式").sendToTarget();
-                    //window.dismiss();
-                }
+
+
                 if (checkedId == R.id.rb_ctype_3 && config.listenerPay!=3 ) //rb3设定为正确答案
                 {
                     config.listenerPay=3;

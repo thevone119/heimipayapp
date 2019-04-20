@@ -2,21 +2,32 @@ package com.theone.pay.service;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.theone.pay.MyApplication;
 import com.theone.pay.db.wxDBHandle;
 import com.theone.pay.httpservice.PayService;
+import com.theone.pay.model.MyNotification;
 import com.theone.pay.model.RetObject;
 import com.theone.pay.model.SysConfig;
 import com.theone.pay.utils.MyRequests;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 /**
  * 后台服务，用于各种定时，非定时启动的后台服务
- *
+ * 这个Service有可能被系统回收了，还是用通知好点，靠
  */
 public class MyService extends Service {
     public static final String TAG = "MyService";
+    public static long lastRunTime = 0;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -37,35 +48,7 @@ public class MyService extends Service {
         //发送服务
         if("sendAllNotify".equals(data)){
             try{
-                //开启线程处理
-                new Thread(){
-                    @Override
-                    public void run() {
-                        //1.请求测试网络
-                        try{
-                            MyRequests req =new MyRequests();
-                            req.setConnectTimeout(2000);
-                            req.setReadTimeout(3000);
-                            req.get("http://www.baidu.com");
-                        }catch (Exception e){
-                            e.printStackTrace();
-                        }
-                        //2.发送
-                        try {
-                            new PayService().sendAllNotify();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        //加载微信数据
-                        try {
-                            if(SysConfig.getCurrSysConfig().listenerPay==2){
-                                wxDBHandle.loadWXData();
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }.start();
+                runThread();
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -81,16 +64,113 @@ public class MyService extends Service {
     public void onDestroy() {
         //销毁时发出广播，接收到广播后重启service
         //取消前台运行
-        stopForeground(true);
+        //stopForeground(true);
+        //消耗的时候，重启，死循环
 
         Intent intent = new Intent("com.theone.pay.service.destroy");
         sendBroadcast(intent);
         super.onDestroy();
         Log.w(TAG, "in onDestroy");
-
     }
 
+    /**
+     * 定时执行的后台任务
+     * 每分钟执行一次
+     */
+    public static void runThread(){
+        if(System.currentTimeMillis()-lastRunTime<1000*30){
+            Log.w(TAG, "重复执行");
+            return;
+        }
+        Log.w(TAG, "执行定时任务");
+        lastRunTime = System.currentTimeMillis();
+        try{
+            //开启线程处理
+            new Thread(){
+                @Override
+                public void run() {
+                    //1.请求测试网络
+                    try{
+                        MyRequests req =new MyRequests();
+                        req.setConnectTimeout(2000);
+                        req.setReadTimeout(3000);
+                        req.get("http://www.baidu.com");
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                    //2.发送
+                    try {
+                        new PayService().sendAllNotify();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    //加载微信数据
+                    try {
+                        if(SysConfig.getCurrSysConfig().listenerPay==1||SysConfig.getCurrSysConfig().listenerPay==2){
+                            wxDBHandle.loadWXData();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
+                    //加载Xposed重发数据
+                    try {
+                        reLoadXposedData();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
+        }catch(Exception e){
 
+        }
+    }
+
+    public static void reLoadXposedData(){
+        String path = Environment.getExternalStoragePublicDirectory("") + "/theonepay/";
+        File file = new File(path);
+        if (!file.exists()) {
+            return;
+        }
+        //遍历文件进行读取
+        File[] fs = file.listFiles();
+        long currTime = System.currentTimeMillis();
+        for(File f:fs){
+            //大于5秒的文件才处理
+            if(f.isFile()&&f.getName().startsWith("wxm_")&&(currTime-f.lastModified()>1000*5)){
+                String coutent = "";
+                try{
+                    InputStream instream = new FileInputStream(f);
+                    InputStreamReader inputreader
+                            = new InputStreamReader(instream);
+                    BufferedReader buffreader = new BufferedReader(inputreader);
+
+                    String line = "";
+                    //分行读取
+                    while ((line = buffreader.readLine()) != null) {
+                        coutent += line;
+                    }
+                    instream.close();//关闭输入流
+                    buffreader.close();
+                    f.delete();
+                }catch (Exception e){
+
+                }
+                try{
+                    //
+                    if(coutent!=null &&coutent.length()>3){
+                        Gson gson = new Gson();
+                        MyNotification msg = gson.fromJson(coutent,MyNotification.class);
+                        if(msg!=null){
+                            new PayService().saveAndSendNotify(msg);
+                        }
+                    }
+                }catch (Exception e){
+
+                }
+            }
+        }
+
+    }
 
 }

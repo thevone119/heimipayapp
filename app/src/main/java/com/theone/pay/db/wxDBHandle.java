@@ -66,18 +66,23 @@ public class wxDBHandle {
     //存在判断
     private static Map<String,String> hasMap = new HashMap<String,String>();
 
+    private static String wxpwd=null;
+
     /**
      * 每分钟调用一次此方法
      *
      */
     public static void loadWXData(){
+        if(!getRootAhth()){
+            return;
+        }
         lastIdx++;
         //线程刷新
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
                 long _lastIdx = lastIdx;
-                for(int i=0;i<10;i++){
+                for(int i=0;i<15;i++){
                     try{
                         //如果已经大于55秒了，直接退出了
                         if(_lastIdx!=lastIdx){
@@ -104,13 +109,7 @@ public class wxDBHandle {
         }
         lastTime = System.currentTimeMillis();
         //1.判断是否有ROOT权限，如果没有权限，直接返回
-        if(!mHaveRoot){
-            int ret = execRootCmdSilent("echo test"); // 通过执行测试命令来检测
-            if (ret != -1) {
-                mHaveRoot = true;
-            }
-        }
-        if(!mHaveRoot){
+        if(!getRootAhth()){
             Log.i(TAG,"没有ROOT权限，无法读取数据");
             return;
         }
@@ -153,8 +152,8 @@ public class wxDBHandle {
             Calendar now =Calendar.getInstance();
             now.add(Calendar.DAY_OF_YEAR,-1);
             long qt = now.getTime().getTime();
-            Log.i(TAG,"time:"+qt);
-            Cursor c1 = db.rawQuery("select * from message where createtime > "+qt+" and talker='notifymessage' ", null);
+            Log.i(TAG,"redtime:"+qt);
+            Cursor c1 = db.rawQuery("select * from message where createtime > "+qt+"  ", null);
             while (c1.moveToNext()) {
                 try{
                     String msgSvrId = c1.getString(c1.getColumnIndex("msgSvrId"));
@@ -171,8 +170,14 @@ public class wxDBHandle {
                         msg.msgid=msgSvrId;
                         msg.createtime = parseLong(createTime);
                         msg.msgseq = parseInt(msgSeq);
-                        //发送并保存
-                        new PayService().saveAndSendNotify(new MyNotification(msg));
+                        if(hasMap==null){
+                            hasMap =  new HashMap<String,String>();
+                        }
+                        if(!hasMap.containsKey(msg.msgid)){
+                            hasMap.put(msg.msgid,"1");
+                            //发送并保存
+                            new PayService().saveAndSendNotify(new MyNotification(msg));
+                        }
                     }
                 }catch (Exception e){
 
@@ -257,11 +262,12 @@ public class wxDBHandle {
      * @return
      */
     public static String getWxPwd(){
-        String md5 = md5(MyApplication.getApplication().getImei() + getCurrWxUin());
-
-        String password = md5.substring(0, 7).toLowerCase();
-       //Log.i(TAG,"密码"+password);
-        return password;
+        if(wxpwd==null){
+            String md5 = md5(MyApplication.getApplication().getImei() + getCurrWxUin());
+            wxpwd = md5.substring(0, 7).toLowerCase();
+        }
+       //Log.i(TAG,"密码"+wxpwd);
+        return wxpwd;
     }
 
     /**

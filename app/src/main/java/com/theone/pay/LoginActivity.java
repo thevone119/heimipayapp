@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -40,6 +41,7 @@ public class LoginActivity extends AppCompatActivity {
         //如果已经有商户，则直接完成登录
         if(PayBus.getCurrPayBus()!=null){
             mHandler.obtainMessage(0, "登录成功").sendToTarget();
+
         }
     }
 
@@ -106,6 +108,9 @@ public class LoginActivity extends AppCompatActivity {
                     RetObject ret = new PayService().login(acc,pwd);
                     if(ret.getSuccess()){
                         mHandler.obtainMessage(0, "登录成功").sendToTarget();
+
+
+
                     }else{
                         mHandler.obtainMessage(-1, ret.getMsg()).sendToTarget();
                     }

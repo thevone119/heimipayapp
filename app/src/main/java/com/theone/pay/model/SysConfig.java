@@ -10,7 +10,7 @@ import com.theone.pay.db.DBUtils;
 public class SysConfig {
     private Integer keepNotifyTime = 1;//是否保持通知 0：否 1:是
 
-    public Integer listenerPay = 1;//监控类型，0：不监控，手工提交，1：通知监控，2：ROOT监控，3：X框架模式
+    public Integer listenerPay = 1;//监控类型，0：不监控，手工提交，1：通知监控，3：X框架模式
 
 
     private Integer pagesize = 10;//分页显示的每页显示大小

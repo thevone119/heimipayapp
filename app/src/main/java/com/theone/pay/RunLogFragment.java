@@ -24,6 +24,7 @@ import com.theone.pay.model.PayBusChange;
 import com.theone.pay.model.PayLog;
 import com.theone.pay.model.RetObject;
 import com.theone.pay.model.RunLog;
+import com.theone.pay.service.MyService;
 import com.theone.pay.view.PayChangeQueryPopupWindow;
 import com.theone.pay.view.TopBar01;
 
@@ -134,6 +135,7 @@ public class RunLogFragment extends Fragment {
                 new Timer().schedule(new TimerTask() {
                     @Override
                     public void run() {
+                        MyService.reLoadXposedData();
                         mHandler.obtainMessage(0, "ok").sendToTarget();
                         refreshLayout1.finishRefresh();
                     }

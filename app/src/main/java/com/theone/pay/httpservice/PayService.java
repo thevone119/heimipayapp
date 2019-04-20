@@ -144,6 +144,7 @@ public class PayService {
         }
         RunLog.putLog("订单查询","订单查询");
         String url = BaseUrlTools.getBaseUrl()+"/api/pay/paylog/findPage";
+        Log.i("PAY","url:"+url);
         MyRequests req =new MyRequests();
         Map<String,String> postData =new HashMap<String,String>();
         postData.put("uid",paybus.getUuid());
@@ -502,6 +503,7 @@ public class PayService {
         //2.发送服务器请求
         try{
             RetObject ret2 = sendNotify(notify);
+            Log.i(TAG,"发送数据返回:"+ret2.getSuccess());
             if(ret2.getSuccess()){
                 notify.setState(1);
             }

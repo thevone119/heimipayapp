@@ -46,8 +46,8 @@ public class MyNotificationListenerService extends NotificationListenerService {
             hasMap = new HashMap<String,String>();
         }
         if(SysConfig.getCurrSysConfig().listenerPay!=1){
-            Log.i(TAG,"非通知监控，不处理 " );
-            return;
+            //Log.i(TAG,"非通知监控，不处理 " );
+            //return;
         }
         ////开启线程处理
         ////线程处理
